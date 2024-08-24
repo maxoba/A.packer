@@ -2,7 +2,7 @@ provider "aws" {
   region = "us-west-2"
 }
 
-data "aws_ami" "packer" {
+data "aws_ami" "Packer-terraform-ami" {
   owners      = ["self"] 
   most_recent = true
 
@@ -13,7 +13,7 @@ data "aws_ami" "packer" {
 }
 
 resource "aws_instance" "packer" {
-  ami           = data.aws_ami.packer.id
+  ami           = data.aws_ami.Packer-terraform-ami.id
   instance_type = "t2.micro"
 
   tags = {
@@ -22,9 +22,9 @@ resource "aws_instance" "packer" {
 }
 
 output "ami-id" {
-  value = data.aws_ami.packer.id  
+  value = data.aws_ami.Packer-terraform-ami.id  
 }
 
 output "ami-name" {
-  value = data.aws_ami.packer.name 
+  value = data.aws_ami.Packer-terraform-ami.name 
 }
