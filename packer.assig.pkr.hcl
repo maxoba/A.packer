@@ -8,10 +8,10 @@ packer {
 }
 
 source "amazon-ebs" "ubuntu" {
-  ami_name      = "packerA-ubuntu-ami-{{timestamp}}"
-  instance_type = "t2.micro"
-  region        = "us-west-2"
-
+  ami_name      = "${var.ami_prefix}-${local.timestamp}"
+  instance_type = var.instance_type
+  region        = var.region
+  ami_regions   = var.ami_regions
   source_ami_filter {
     filters = {
       name                = "ubuntu/images/*ubuntu-jammy-22.04-amd64-server-*"
@@ -21,16 +21,8 @@ source "amazon-ebs" "ubuntu" {
     most_recent = true
     owners      = ["099720109477"]
   }
-
   ssh_username = "ubuntu"
-
-  tags = {
-    "Name"        = "MyUbuntuImage"
-    "Environment" = "Production"
-    "OS_Version"  = "Ubuntu 22.04"
-    "Release"     = "Latest"
-    "Created-by"  = "Packer"
-  }
+  tags         = var.tags
 }
 
 build {
@@ -40,12 +32,17 @@ build {
 
   provisioner "shell" {
     inline = [
-      "sudo apt-get update -y",
+      "echo Installing Updates",
       "sudo apt-get update -y",
       "sudo apt-get upgrade -y",
-
-      "sudo apt-get install -y apache2"
+      "sudo apt-get install -y nginx"
     ]
   }
+
+  post-processor "manifest" {}
 }
-  
+
+locals {
+  timestamp = regex_replace(timestamp(), "[- TZ:]", "")
+
+}
